@@ -78,9 +78,9 @@ void user_isr(void)
                     move_icon(pipe2_row, pipe2_col, 22, 0, -2);  // Example movement for pipe 2
                     move_icon(pipe3_row, pipe3_col, 18, 0, -3);  // Example movement for pipe 3
                     move_icon(pipe4_row, pipe4_col, 26, 0, -1);  // Example movement for pipe 4
-                    move_icon(pipe5_row, pipe5_col, 38, 0, -2);  // Example movement for pipe 5
-                    move_icon(pipe7_row, pipe7_col, 14, 0, -3);  // Example movement for pipe 7
-                    move_icon(pipe8_row, pipe8_col, 46, 0, -1);  // Example movement for pipe 8
+                    move_icon(pipe5_row, pipe5_col, 38, 0, -2); 
+                    move_icon(pipe7_row, pipe7_col, 14, 0, -3);  
+                    move_icon(pipe8_row, pipe8_col, 46, 0, -1);  
                     move_icon(pipe9_row, pipe9_col, 10, 0, -2);
                     break;
 
