@@ -25,6 +25,8 @@ volatile int *portD;
 volatile int *triseD;
 volatile int *trisE = (volatile int*) 0xbf886100;
 volatile int *portE = (volatile int*) 0xbf886110;
+volatile int count2 = 0; // Declare count2 globally and initialize to 0
+
 
 int timeoutcount = 0; 
 int count=0;
@@ -35,19 +37,16 @@ int prime = 1234567;
 
 
 /* Interrupt Service Routine */
-void user_isr(void)
-{
-   if (IFS(0) & 0x0100)
-   { 
-      IFSCLR(0) = 0x100; 
-      timeoutcount++; 
-        if (timeoutcount == 10) // Every 10th interrupt
-        {
+void user_isr(void) {
+    if (IFS(0) & 0x0100) { 
+        IFSCLR(0) = 0x100; 
+        timeoutcount++; 
+
+        if (timeoutcount == 10) { // Every 10th interrupt
             timeoutcount = 0;
 
-            switch (gamestate) 
-            {
-                case 0:
+            switch (gamestate) {
+                case 0: // Menu state
                     clearScreen();
                     draw_icon(icon_row, icon_col, 20);
                     if (getbtns() == 4) {
@@ -55,39 +54,52 @@ void user_isr(void)
                     }
                     break;
 
-                case 1:
-                    clearScreen();
-                    draw_icon(icon_row, icon_col, 20);
-                    draw_icon(pipe1_row,pipe1_col,28);
-                    draw_icon(pipe2_row,pipe2_col,22);
-                    draw_icon(pipe3_row,pipe3_col,18);
-                    draw_icon(pipe4_row,pipe4_col,26);
-                    draw_icon(pipe5_row,pipe5_col,38);  
-                    draw_icon(pipe7_row,pipe7_col,14);
-                    draw_icon(pipe8_row,pipe8_col,46);
-                    draw_icon(pipe9_row,pipe9_col,10);
+                case 1: // Game state
+                    count2++;
+                    clearScreen(); // Clear the screen at the beginning of each frame
+                                        draw_icon(icon_row, icon_col, 20); // Ensure the player icon is drawn
 
 
+                    // Draw and move pipes based on their positions and intervals
+                    draw_icon(pipe1_row, pipe1_col, 28);
+                    move_icon(pipe1_row, pipe1_col, 28, 0, -1);
 
+                    draw_icon(pipe2_row, pipe2_col, 22);
+                    move_icon(pipe2_row, pipe2_col, 22, 0, -1);
+
+                    draw_icon(pipe3_row, pipe3_col, 18);
+                    move_icon(pipe3_row, pipe3_col, 18, 0, -1);
+
+                    draw_icon(pipe4_row, pipe4_col, 26);
+                    move_icon(pipe4_row, pipe4_col, 26, 0, -1);
+
+                    draw_icon(pipe5_row, pipe5_col, 38);
+                    move_icon(pipe5_row, pipe5_col, 38, 0, -1);
+
+                    draw_icon(pipe7_row, pipe7_row, 14);
+                    move_icon(pipe7_row, pipe7_col, 14, 0, -1);
+
+                    draw_icon(pipe8_row, pipe8_row, 46);
+                    move_icon(pipe8_row, pipe8_col, 46, 0, -1);
+
+                    draw_icon(pipe9_row, pipe9_col, 10);
+                    move_icon(pipe9_row, pipe9_col, 10, 0, -1);
+
+                    // Player icon movement
                     box_move = 2;
                     if (getbtns() == 4) {
                         box_move = -3;
                     }
                     move_icon(icon_row, icon_col, 20, box_move, 0);
-                    move_icon(pipe1_row, pipe1_col, 28, 0, -1);  // Example movement for pipe 1
-                    move_icon(pipe2_row, pipe2_col, 22, 0, -2);  // Example movement for pipe 2
-                    move_icon(pipe3_row, pipe3_col, 18, 0, -3);  // Example movement for pipe 3
-                    move_icon(pipe4_row, pipe4_col, 26, 0, -1);  // Example movement for pipe 4
-                    move_icon(pipe5_row, pipe5_col, 38, 0, -2); 
-                    move_icon(pipe7_row, pipe7_col, 14, 0, -3);  
-                    move_icon(pipe8_row, pipe8_col, 46, 0, -1);  
-                    move_icon(pipe9_row, pipe9_col, 10, 0, -2);
-                    break;
 
+                    break;
             }
         }
     }
 }
+
+
+
 
  /*//SW3
    if (IFS(0) & 0x8000) { 
@@ -100,25 +112,39 @@ void user_isr(void)
 /* Lab-specific initialization goes here */
 void labinit(void)
 {
-  //Switch 4 interrupt
-  *trisE = 0x00 & *trisE;//Sets portE to output, LED lights
-  TRISDSET = 0x800; //Sets switch 4 to input
-  IPC(4) = 0x7 << 2 | 0x3; //Prioritet
-  IEC(0) = (IEC(0) | 0x80000); //Enable switch 4 interrupt
+    // Initialize switches and interrupts
+    *trisE = 0x00 & *trisE; // Sets portE to output, LED lights
+    TRISDSET = 0x800; // Sets switch 4 to input
+    IPC(4) = 0x7 << 2 | 0x3; // Priority
+    IEC(0) = (IEC(0) | 0x80000); // Enable switch 4 interrupt
 
+    // Timer2 initialization
+    TMR2 = 0;          // Initialize timer 2
+    T2CONSET = 0x0070; // Set to prescale 1:256
+    PR2 = ((80000000 / 256) / 100); // Set period for 10Hz
+    T2CONSET = 0x8000; // Enable timer 2
 
-  //Timer2
-  TMR2 = 0;          // Initalize timer 2
-  T2CONSET = 0x0070; // Set to prescale 1:256
-  PR2 = ((80000000 / 256) / 100);
-  T2CONSET = 0x8000;
+    IPCSET(2) = 6; // Set interrupt priority
+    IECSET(0) = 0x100; // Enable Timer2 interrupt
 
-  IPCSET(2) = 6;
-  IECSET(0) = 0x100;
+    enable_interrupts();
 
-  enable_interrupts();
-  return;
+    // Initialize icon positions and ensure they are within bounds
+    move_icon(pipe1_row, pipe1_col, 28, 0, 0);
+    move_icon(pipe2_row, pipe2_col, 22, 0, 30);
+    move_icon(pipe3_row, pipe3_col, 18, 0, 30);
+    move_icon(pipe5_row, pipe5_col, 38, 0, 60);
+    move_icon(pipe9_row, pipe9_col, 10, 0, 60);
+    move_icon(pipe4_row, pipe4_col, 26, 0, 90);
+    move_icon(pipe7_row, pipe7_col, 14, 0, 90);
+    move_icon(pipe8_row, pipe8_col, 46, 0, 120);
+
+    // Initialize player icon position
+    move_icon(icon_row, icon_col, 20, 0, 0);
+
+    return;
 }
+
 
 /* This function is called repetitively from the main program */
 void labwork( void )
