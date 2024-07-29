@@ -485,16 +485,27 @@ for(i = 0; i < 1024; i++){
 	}
 }
 
-bool collision(int size){
+bool collision_col(uint8_t* pipe_col, int size){
   int i;
-  for ( i = 0; i <size; i ++)
-  {
-    int col_distance= pipe1_col[i]-icon_col[1];
-    if (col_distance==0){
-      return true;
+  for(i = 0; i <= size; i++){
+    int col_dis = pipe_col[i] - icon_col[3];
+    if(col_dis < 4 && col_dis >= 0){
+        return true;
     }
   }
+  return false; 
 }
+bool collision_row(uint8_t* pipe_row, int size){
+  int i;
+  for(i = 0; i <= size; i++){
+    int row_dis = icon_row[3] - pipe_row[i];
+    if(row_dis < 4 && row_dis >= 0){
+        return true;
+    }
+  }
+  return false; 
+}
+
    
 
 
