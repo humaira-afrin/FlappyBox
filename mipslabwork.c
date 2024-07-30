@@ -51,7 +51,9 @@ void user_isr(void)
             switch (gamestate) {
                 case 0: // Menu state
                     clearScreen();
-                    draw_icon(icon_row, icon_col, 20);
+                    draw_icon(icon_row, icon_col, 13);
+                    draw_icon(pipe1_row,pipe1_col,28);
+                    draw_icon(pipe2_row, pipe2_col, 22);
                     if (getbtns() == 4) {
                         gamestate = 1;
                     }
@@ -60,7 +62,7 @@ void user_isr(void)
                 case 1: // Game state
                     count2++;
                     clearScreen(); // Clear the screen at the beginning of each frame
-                    draw_icon(icon_row, icon_col, 20); // Ensure the player icon is drawn
+                    draw_icon(icon_row, icon_col, 13); // Ensure the player icon is drawn
 
 
                     // Draw and move pipes based on their positions and intervals
@@ -93,7 +95,7 @@ void user_isr(void)
                     if (getbtns() == 4) {
                         box_move = -3;
                     }
-                    move_icon(icon_row, icon_col, 20, box_move, 0);
+                    move_icon(icon_row, icon_col, 13, box_move, 0);
                     /*if (count2 > 120 && count2 < 278) {
                         // No operation is performed in this range
                     } 
@@ -120,14 +122,14 @@ void user_isr(void)
 
                   
 
-                   if (collision_col(28, pipe1_col, icon_col) || collision_row(28, pipe1_row, icon_row) ||
-                        collision_col(26, pipe2_col, icon_col) || collision_row(26, pipe2_row, icon_row) ||
-                        collision_col(18, pipe3_col, icon_col) || collision_row(18, pipe3_row, icon_row) ||
-                        collision_col(26, pipe4_col, icon_col) || collision_row(26, pipe4_row, icon_row) ||
-                        collision_col(38, pipe5_col, icon_col) || collision_row(38, pipe5_row, icon_row) ||
-                        collision_col(14, pipe7_col, icon_col) || collision_row(14, pipe7_row, icon_row) ||
-                        collision_col(46, pipe8_col, icon_col) || collision_row(46, pipe8_row, icon_row) ||
-                        collision_col(10, pipe9_col, icon_col) || collision_row(10, pipe9_row, icon_row))
+                   if ((collision_col(pipe1_col, 28) && collision_row(pipe1_row, 28)) ||
+                        (collision_col(pipe2_col, 22) && collision_row(pipe2_row, 22)) ||
+                        (collision_col(pipe3_col, 18) && collision_row(pipe3_row, 18)) ||
+                        (collision_col(pipe4_col, 26) && collision_row(pipe4_row, 26)) ||
+                        (collision_col(pipe5_col, 38) && collision_row(pipe5_row, 38)) ||
+                        (collision_col(pipe7_col, 14) && collision_row(pipe7_row, 14)) ||
+                        (collision_col(pipe8_col, 46) && collision_row(pipe8_row, 46)) ||
+                        (collision_col(pipe9_col, 10) && collision_row(pipe9_row, 10)))
                         {
                             clearScreen();
                             gamestate = 2;
@@ -137,7 +139,7 @@ void user_isr(void)
                     
                 case 2:
                 clearScreen();
-                draw_icon(icon_row, icon_col, 20);
+                draw_icon(icon_row, icon_col, 13);
                 if (getbtns() == 2) {
                     clearScreen();
                     gamestate=0;
@@ -194,7 +196,7 @@ void labinit(void)
 
 
     // Initialize player icon position
-    move_icon(icon_row, icon_col, 20, 0, 0);
+    move_icon(icon_row, icon_col, 13, 0, 0);
 
     return;
 }
