@@ -8,6 +8,7 @@
    For copyright and licensing, see file COPYING */
 
 /* Declare display-related functions from mipslabfunc.c */
+#include <stdbool.h>
 void display_image(int x, const uint8_t *data);
 void display_init(void);
 void display_string(int line, char *s);
@@ -20,7 +21,10 @@ void draw_pixel(int row, int col);
 void display_pixel(int row, int col, int val);
 void draw_icon(uint8_t* data_row, uint8_t* data_col, int size);
 void move_icon(uint8_t* data_row, uint8_t* data_col,int iconsize, int rowmovment, int colmovment);
-void move_titlescrean(uint8_t* data_row, uint8_t* data_col, int size, int rowmovement, int colmovment);
+void clearScreen();
+bool collision_col(uint8_t* pipe_col, int size);
+bool collision_row(uint8_t* pipe_row, int size);
+
 
 char * itoaconv( int num );
 void labwork(void);
@@ -66,7 +70,8 @@ extern uint8_t pipe8_row[46];
 extern uint8_t pipe8_col[46];
 extern uint8_t pipe9_row[10];
 extern uint8_t pipe9_col[10];
-
+extern uint8_t mainstart_row[59];
+extern uint8_t mainstart_col[59];
 //extern const uint8_t const icon2[128];
   uint8_t triangle[128*4];
   uint8_t nybild[128*4];

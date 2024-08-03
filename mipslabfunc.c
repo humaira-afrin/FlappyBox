@@ -498,8 +498,10 @@ bool collision_col(uint8_t* pipe_col, int size){
 bool collision_row(uint8_t* pipe_row, int size){
   int i;
   for(i = 0; i <= size; i++){
-    int row_dis = icon_row[3] - pipe_row[i];
-    if(row_dis < 4 && row_dis >= 0){
+    int row_dis1 = icon_row[1] - pipe_row[i];
+    int row_dis2 = pipe_row[i]-icon_row[4];
+    if((row_dis1 < 4 && row_dis1 >= 0)||(row_dis2 < 4 && row_dis2 >= 0))
+    {
         return true;
     }
   }

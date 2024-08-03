@@ -50,10 +50,11 @@ void user_isr(void)
 
             switch (gamestate) {
                 case 0: // Menu state
-                    clearScreen();
+                   clearScreen();
+                   //draw_icon(mainstart_row, mainstart_col,59);
                     draw_icon(icon_row, icon_col, 13);
-                    draw_icon(pipe1_row,pipe1_col,28);
-                    draw_icon(pipe2_row, pipe2_col, 22);
+                    //draw_icon(pipe1_row,pipe1_col,28);
+                    //draw_icon(pipe3_row, pipe3_col, 18);
                     if (getbtns() == 4) {
                         gamestate = 1;
                     }
@@ -91,33 +92,11 @@ void user_isr(void)
                     move_icon(pipe9_row, pipe9_col, 10, 0, -1);
 
                     // Player icon movement
-                    box_move = 2;
+                    box_move = 1;
                     if (getbtns() == 4) {
-                        box_move = -3;
+                        box_move = -1;
                     }
                     move_icon(icon_row, icon_col, 13, box_move, 0);
-                    /*if (count2 > 120 && count2 < 278) {
-                        // No operation is performed in this range
-                    } 
-                    else if (count2 == 128) {
-                        move_icon(pipe1_row, pipe1_col, 28, 0, 180); // Reposition pipe1
-                    } 
-                    else if (count2 == 158) {
-                        move_icon(pipe2_row, pipe2_col, 22, 0, 180); // Reposition pipe2
-                        move_icon(pipe3_row, pipe3_col, 18, 0, 180); // Reposition pipe3
-                    } 
-                    else if (count2 == 188) {
-                        move_icon(pipe5_row, pipe5_col, 38, 0, 180); // Reposition pipe5
-                        move_icon(pipe5_row, pipe5_col, 38, 0, 180); // Duplicate call, likely an error
-                    } 
-                    else if (count2 == 218) {
-                        move_icon(pipe4_row, pipe4_col, 26, 0, 180); // Reposition pipe4
-                        move_icon(pipe7_row, pipe7_col, 14, 0, 180); // Reposition pipe7
-                    } 
-                    else if (count2 == 248) {
-                        move_icon(pipe8_row, pipe8_col, 46, 0, 180); // Reposition pipe8
-                        count2 = 98; // Reset count2 to prevent overflow and start the cycle again
-                    }*/
 
 
                   
@@ -131,6 +110,15 @@ void user_isr(void)
                         (collision_col(pipe8_col, 46) && collision_row(pipe8_row, 46)) ||
                         (collision_col(pipe9_col, 10) && collision_row(pipe9_row, 10)))
                         {
+                            move_icon(pipe1_row, pipe1_col, 28, 0, 180);
+                            move_icon(pipe2_row, pipe2_col, 22, 0, 180);
+                            move_icon(pipe3_row, pipe3_col, 18, 0, 180);
+                            move_icon(pipe5_row, pipe5_col, 38, 0, 180);
+                            move_icon(pipe9_row, pipe9_col, 10, 0, 180);
+                            move_icon(pipe4_row, pipe4_col, 26, 0, 180);
+                            move_icon(pipe7_row, pipe7_col, 14, 0, 180);
+                            move_icon(pipe8_row, pipe8_col, 46, 0, 180);
+                            move_icon(pipe9_row, pipe9_col, 46, 0, 180);
                             clearScreen();
                             gamestate = 2;
                         }
@@ -140,8 +128,40 @@ void user_isr(void)
                 case 2:
                 clearScreen();
                 draw_icon(icon_row, icon_col, 13);
+
                 if (getbtns() == 2) {
                     clearScreen();
+                      // Initialize icon positions and ensure they are within bounds
+
+                    draw_icon(pipe1_row, pipe1_col, 28);
+
+                    draw_icon(pipe2_row, pipe2_col, 22);
+
+                    draw_icon(pipe3_row, pipe3_col, 18);
+
+                    draw_icon(pipe4_row, pipe4_col, 26);
+
+                    draw_icon(pipe5_row, pipe5_col, 38);
+
+                    draw_icon(pipe7_row, pipe7_col, 14);
+
+                    draw_icon(pipe8_row, pipe8_col, 46);
+
+                    draw_icon(pipe9_row, pipe9_col, 10);
+                    /*
+
+                    move_icon(pipe1_row, pipe1_col, 28, 0, 0);
+                    move_icon(pipe2_row, pipe2_col, 22, 0, 30);
+                    move_icon(pipe3_row, pipe3_col, 18, 0, 30);
+                    move_icon(pipe5_row, pipe5_col, 38, 0, 60);
+                    move_icon(pipe9_row, pipe9_col, 10, 0, 60);
+                    move_icon(pipe4_row, pipe4_col, 26, 0, 90);
+                    move_icon(pipe7_row, pipe7_col, 14, 0, 90);
+                    move_icon(pipe8_row, pipe8_col, 46, 0, 120);
+                    move_icon(pipe9_row, pipe9_col, 46, 0, 100);*/
+
+                    // Initialize player icon position
+                    //move_icon(icon_row, icon_col, 13, 0, 0);
                     gamestate=0;
                 }
                  break;
@@ -155,11 +175,7 @@ void user_isr(void)
 
 
 
- /*//SW3
-   if (IFS(0) & 0x8000) { 
-	   T2CONCLR = 0x8000;
-      IFSCLR(0) = 0x8000; 
-   }*/
+ 
 
 
 
@@ -180,6 +196,11 @@ void labinit(void)
 
     IPCSET(2) = 6; // Set interrupt priority
     IECSET(0) = 0x100; // Enable Timer2 interrupt
+    //SW3
+   if (IFS(0) & 0x8000) { 
+	   T2CONCLR = 0x8000;
+      IFSCLR(0) = 0x8000; 
+   }
 
     enable_interrupts();
 
@@ -192,7 +213,7 @@ void labinit(void)
     move_icon(pipe4_row, pipe4_col, 26, 0, 90);
     move_icon(pipe7_row, pipe7_col, 14, 0, 90);
     move_icon(pipe8_row, pipe8_col, 46, 0, 120);
-    move_icon(pipe9_row, pipe9_col, 46, 0, 120);
+    move_icon(pipe9_row, pipe9_col, 46, 0, 100);
 
 
     // Initialize player icon position
