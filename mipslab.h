@@ -24,6 +24,9 @@ void move_icon(uint8_t* data_row, uint8_t* data_col,int iconsize, int rowmovment
 void clearScreen();
 bool collision_col(uint8_t* pipe_col, int size);
 bool collision_row(uint8_t* pipe_row, int size);
+void draw_top_line();
+void draw_bottom_line();
+bool collision_margins();
 
 
 char * itoaconv( int num );
@@ -49,8 +52,8 @@ void display_debug( volatile int * const addr );
 /* Declare bitmap array containing font */
 extern const uint8_t const font[128*8];
 /* Declare bitmap array containing icon */
- uint8_t icon_row[13];
-uint8_t icon_col[13];
+ uint8_t icon_row[12];
+uint8_t icon_col[12];
 /**** PIPES ***** */
 extern uint8_t pipe1_row[28];
 extern uint8_t pipe1_col[28];
@@ -70,6 +73,7 @@ extern uint8_t pipe8_row[46];
 extern uint8_t pipe8_col[46];
 extern uint8_t pipe9_row[10];
 extern uint8_t pipe9_col[10];
+
 extern uint8_t mainstart_row[59];
 extern uint8_t mainstart_col[59];
 //extern const uint8_t const icon2[128];

@@ -355,7 +355,7 @@ char * itoaconv( int num )
 
 void CountDown (void) 
 {
-         display_string(2, "GEOMETRIC DASH");
+         display_string(2, "FLAPPY BOX");
 	        display_update();
 	        delay( 1000 );
 	        display_string(2, "      3");
@@ -404,6 +404,7 @@ void highScoreCheck(){
 }
 void start(){
   display_string(1,"   START");
+  display_string(2,"   PRESS 1");
   display_update();
 }
 /*###############################################################################*/
@@ -425,28 +426,24 @@ void draw_pixel(int row, int col){  // ritar en pixel på den row och col koordi
 
 }
 
-void display_pixel(int row, int col, int val) { //översätter drawpixel till maskinspråk :)
-    uint8_t x = myArray[row*128 + col];
-    x = x | val;
-    myArray[row*128 + col] = x;
+void display_pixel(int row, int col, int val) { 
+    uint8_t x = myArray[row*128 + col]; // Get the current pixel value in memory
+    x = (val == 0) ? (x & ~val) : (x | val); // Only set or clear the bit based on val
+    myArray[row*128 + col] = x; // Update the pixel in memory
 
-    // Set the page and column address
+    // Set the page and column address for display update
     DISPLAY_CHANGE_TO_COMMAND_MODE;
     spi_send_recv(0x22);  // Command to set page address
-    spi_send_recv(row);   // Row/Page start address
-    spi_send_recv(row);   // Row/Page end address (should be the same for single row)
+    spi_send_recv(row);   // Set the row (page) address
+    spi_send_recv(row);   // Same value for start and end address (single row)
     spi_send_recv(0x21);  // Command to set column address
-    spi_send_recv(col);   // Column start address
-    spi_send_recv(col);   // Column end address (should be the same for single column)
+    spi_send_recv(col);   // Set column (x-axis) address
+    spi_send_recv(col);   // Same value for start and end address (single column)
 
     DISPLAY_CHANGE_TO_DATA_MODE;
-
-    // Read the existing value from the specified location
-    
-
-    // Write the merged value back to the specified location
-    spi_send_recv(myArray[row*128 + col]);
+    spi_send_recv(myArray[row*128 + col]);  // Send the updated pixel value to the display
 }
+
 
 void draw_icon(uint8_t* data_row, uint8_t* data_col, int size){   //ritar hela iconen med hjälp av en forloop som loopar igenom varje pixel man har på rows och columner så att hela iconen kan displayas
   int i;
@@ -464,26 +461,29 @@ void move_icon(uint8_t* data_row, uint8_t* data_col,int iconsize,int rowmovment,
 }
 
 void clearScreen(){
-  	int i, j;
-for(i = 0; i < 1024; i++){
-  myArray[i] = 0;
+    int i, j;
+    // Clear the array used for storing pixel data
+    for(i = 0; i < 1024; i++){
+        myArray[i] = 0;
+    }
 
-}
-	for(i = 0; i < 4; i++) {
-		DISPLAY_CHANGE_TO_COMMAND_MODE;
+    // Reset the display by writing zero to all screen data
+    for(i = 0; i < 4; i++) {
+        DISPLAY_CHANGE_TO_COMMAND_MODE;
 
-		spi_send_recv(0x22);
-		spi_send_recv(i);
-		
-		spi_send_recv(0 & 0xF);
-		spi_send_recv(0x10 | ((0 >> 4) & 0xF)); 
-		
-		DISPLAY_CHANGE_TO_DATA_MODE;
-		
-		for(j = 0; j < 128; j++)
-			spi_send_recv(0);
-	}
+        spi_send_recv(0x22);   // Set page address
+        spi_send_recv(i);      // Set page number
+        spi_send_recv(0 & 0xF); // Start column
+        spi_send_recv(0x10 | ((0 >> 4) & 0xF)); // End column
+
+        DISPLAY_CHANGE_TO_DATA_MODE;
+
+        for(j = 0; j < 128; j++) {
+            spi_send_recv(0);  // Send zero to all pixels (clear screen)
+        }
+    }
 }
+
 
 bool collision_col(uint8_t* pipe_col, int size){
   int i;
@@ -507,10 +507,63 @@ bool collision_row(uint8_t* pipe_row, int size){
   }
   return false; 
 }
+bool collision_margins() {
+  int i;
+    for ( i = 0; i < 12; i++) {
+        if (icon_row[i] == 0) {
+            return true; // Collision with top margin
+        }
+    }
+
+    for ( i = 0; i <12; i++) {
+        if (icon_row[i] == 31) {
+            return true; // Collision with bottom margin
+        }
+    }
+
+    return false; // No collision detected
+}
+
 
    
 
+void draw_top_line() {
+    int size = 128; // Total number of pixels in one row (128 columns)
+    uint8_t data_row[128];
+    uint8_t data_col[128];
+    int i;
+    
+    // Populate the arrays
+    for ( i = 0; i < size; i++) {
+        data_row[i] = 0;   // Top row (row index 0)
+        data_col[i] = i;   // All columns from 0 to 127
+    }
+    
+    // Draw the line
+    draw_icon(data_row, data_col, size);
+}
 
+void draw_bottom_line() {
+    int size = 128; // Total number of pixels in one row (128 columns)
+    uint8_t data_row[128];
+    uint8_t data_col[128];
+    int i;
+    
+    // Populate the arrays
+    for ( i = 0; i < size; i++) {
+        data_row[i] = 128;   // Top row (row index 0)
+        data_col[i] = i;   // All columns from 0 to 127
+    }
+    
+    // Draw the line
+    draw_icon(data_row, data_col, size);
+}
+void game_over(){
+  display_string(1,"   GAME OVER");
+    display_string(2,"   PRESS 2");
+
+  display_update();
+}
 
 
 

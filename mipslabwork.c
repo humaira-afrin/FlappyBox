@@ -33,6 +33,7 @@ int count=0;
 int gamestate = 0;
 int box_move;
 int prime = 1234567;
+bool first = true;
 
 
 
@@ -50,20 +51,29 @@ void user_isr(void)
 
             switch (gamestate) {
                 case 0: // Menu state
-                   clearScreen();
-                   //draw_icon(mainstart_row, mainstart_col,59);
-                    draw_icon(icon_row, icon_col, 13);
-                    //draw_icon(pipe1_row,pipe1_col,28);
-                    //draw_icon(pipe3_row, pipe3_col, 18);
-                    if (getbtns() == 4) {
+                clearScreen();
+                   start();
+                   
+                     if (first){
+                        move_icon(icon_row, icon_col,12,1,0);
+                        first=false;
+                    }
+                    draw_icon(icon_row, icon_col,12);
+                    if (getbtns() == 4) { 
+                        clearScreen();
+                        CountDown();                       
                         gamestate = 1;
+                        first=true;
                     }
                     break;
 
                 case 1: // Game state
                     count2++;
+                    draw_top_line();
+                    draw_bottom_line();
                     clearScreen(); // Clear the screen at the beginning of each frame
-                    draw_icon(icon_row, icon_col, 13); // Ensure the player icon is drawn
+                   
+                    draw_icon(icon_row, icon_col, 12); // Ensure the player icon is drawn
 
 
                     // Draw and move pipes based on their positions and intervals
@@ -96,12 +106,13 @@ void user_isr(void)
                     if (getbtns() == 4) {
                         box_move = -1;
                     }
-                    move_icon(icon_row, icon_col, 13, box_move, 0);
+                    move_icon(icon_row, icon_col, 12, box_move, 0);
 
 
                   
 
                    if ((collision_col(pipe1_col, 28) && collision_row(pipe1_row, 28)) ||
+                        (collision_margins())||
                         (collision_col(pipe2_col, 22) && collision_row(pipe2_row, 22)) ||
                         (collision_col(pipe3_col, 18) && collision_row(pipe3_row, 18)) ||
                         (collision_col(pipe4_col, 26) && collision_row(pipe4_row, 26)) ||
@@ -110,6 +121,7 @@ void user_isr(void)
                         (collision_col(pipe8_col, 46) && collision_row(pipe8_row, 46)) ||
                         (collision_col(pipe9_col, 10) && collision_row(pipe9_row, 10)))
                         {
+                            clearScreen();
                             move_icon(pipe1_row, pipe1_col, 28, 0, 180);
                             move_icon(pipe2_row, pipe2_col, 22, 0, 180);
                             move_icon(pipe3_row, pipe3_col, 18, 0, 180);
@@ -127,27 +139,27 @@ void user_isr(void)
                     
                 case 2:
                 clearScreen();
-                draw_icon(icon_row, icon_col, 13);
-
+                game_over();
+                // draw_icon(icon_row, icon_col, 13);
                 if (getbtns() == 2) {
-                    clearScreen();
+                    
                       // Initialize icon positions and ensure they are within bounds
 
-                    draw_icon(pipe1_row, pipe1_col, 28);
+                    // draw_icon(pipe1_row, pipe1_col, 28);
 
-                    draw_icon(pipe2_row, pipe2_col, 22);
+                    // draw_icon(pipe2_row, pipe2_col, 22);
 
-                    draw_icon(pipe3_row, pipe3_col, 18);
+                    // draw_icon(pipe3_row, pipe3_col, 18);
 
-                    draw_icon(pipe4_row, pipe4_col, 26);
+                    // draw_icon(pipe4_row, pipe4_col, 26);
 
-                    draw_icon(pipe5_row, pipe5_col, 38);
+                    // draw_icon(pipe5_row, pipe5_col, 38);
 
-                    draw_icon(pipe7_row, pipe7_col, 14);
+                    // draw_icon(pipe7_row, pipe7_col, 14);
 
-                    draw_icon(pipe8_row, pipe8_col, 46);
+                    // draw_icon(pipe8_row, pipe8_col, 46);
 
-                    draw_icon(pipe9_row, pipe9_col, 10);
+                    // draw_icon(pipe9_row, pipe9_col, 10);
                     /*
 
                     move_icon(pipe1_row, pipe1_col, 28, 0, 0);
@@ -162,6 +174,7 @@ void user_isr(void)
 
                     // Initialize player icon position
                     //move_icon(icon_row, icon_col, 13, 0, 0);
+                    
                     gamestate=0;
                 }
                  break;
@@ -213,11 +226,11 @@ void labinit(void)
     move_icon(pipe4_row, pipe4_col, 26, 0, 90);
     move_icon(pipe7_row, pipe7_col, 14, 0, 90);
     move_icon(pipe8_row, pipe8_col, 46, 0, 120);
-    move_icon(pipe9_row, pipe9_col, 46, 0, 100);
+    //move_icon(pipe9_row, pipe9_col, 46, 0, 100);
 
 
     // Initialize player icon position
-    move_icon(icon_row, icon_col, 13, 0, 0);
+    move_icon(icon_row, icon_col, 12, 0, 0);
 
     return;
 }
