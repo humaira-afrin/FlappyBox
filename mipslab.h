@@ -52,8 +52,15 @@ void display_debug( volatile int * const addr );
 /* Declare bitmap array containing font */
 extern const uint8_t const font[128*8];
 /* Declare bitmap array containing icon */
- uint8_t icon_row[12];
-uint8_t icon_col[12];
+ extern uint8_t icon_row[12];
+extern uint8_t icon_col[12];
+extern uint8_t arrow_row[18];
+extern uint8_t arrow_col[18];
+
+
+extern uint8_t start_row[59];
+extern uint8_t start_col[59];
+
 /**** PIPES ***** */
 extern uint8_t pipe1_row[28];
 extern uint8_t pipe1_col[28];
@@ -93,11 +100,7 @@ int score;
 int highScore;
 
 
-int extern TacoX;       //Tacon som flyger
-int extern TacoY;
 
-int extern Tube1X;
-int extern Tube1Y;
 
 /* Declare text buffer for display output */
 extern char textbuffer[4][16];

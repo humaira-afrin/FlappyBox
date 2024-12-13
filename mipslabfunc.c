@@ -367,10 +367,10 @@ void CountDown (void)
 	        display_string(2, "      1");
 	        display_update();
 	        delay( 1000);
-	        display_string(2, "   LEVEL 1");
+	        display_string(2, "   Press 1");
 	        display_update();
-	        delay( 1000 );
-	       display_update();
+	        delay( 1000 );  
+	       //display_update();
 }
 
 
@@ -384,29 +384,25 @@ void merge(uint8_t *nybild,  uint8_t *icon,  uint8_t *triangle) {
     } 
 }
 
-void display_score(int line, int n) {
-    int i;
-    char int_str[16];  
-    if (line < 0 || line >= 4)
-        return;
-    num32asc(int_str, n);
-    for (i = 0; i < 16 && int_str[i] != '\0'; i++) {
-        textbuffer[line][i] = int_str[i];
-    }
-    for (; i < 16; i++) { //resten spaces
-        textbuffer[line][i] = ' ';
-    }
-}
+// void display_score(int line, int n) {
+//     int i;
+//     char int_str[16];  
+//     if (line < 0 || line >= 4)
+//         return;
+//     num32asc(int_str, n);
+//     for (i = 0; i < 16 && int_str[i] != '\0'; i++) {
+//         textbuffer[line][i] = int_str[i];
+//     }
+//     for (; i < 16; i++) { //resten spaces
+//         textbuffer[line][i] = ' ';
+//     }
+// }
 void highScoreCheck(){
   if (score > highScore) {
      highScore = score;
   }
 }
-void start(){
-  display_string(1,"   START");
-  display_string(2,"   PRESS 1");
-  display_update();
-}
+
 /*###############################################################################*/
 uint8_t myArray[1024] = {0}; 
 
@@ -460,29 +456,36 @@ void move_icon(uint8_t* data_row, uint8_t* data_col,int iconsize,int rowmovment,
   }
 }
 
-void clearScreen(){
+
+void clearScreen() {
     int i, j;
-    // Clear the array used for storing pixel data
-    for(i = 0; i < 1024; i++){
-        myArray[i] = 0;
+    
+    // Clear the array used for storing pixel data (reset all pixels to 0)
+    for(i = 0; i < 1024; i++) {
+        myArray[i] = 0;  // Set all bytes to 0 (clearing the screen in memory)
     }
 
     // Reset the display by writing zero to all screen data
     for(i = 0; i < 4; i++) {
         DISPLAY_CHANGE_TO_COMMAND_MODE;
 
-        spi_send_recv(0x22);   // Set page address
-        spi_send_recv(i);      // Set page number
-        spi_send_recv(0 & 0xF); // Start column
-        spi_send_recv(0x10 | ((0 >> 4) & 0xF)); // End column
+        // Set the page address for the current page (0, 1, 2, 3)
+        spi_send_recv(0x22);   // Set page address command
+        spi_send_recv(i);      // Set the page number (0-3)
+
+        // Set the start and end column for the page (0 to 127)
+        spi_send_recv(0x00);   // Start column (0)
+        spi_send_recv(0x10);   // End column (128)
 
         DISPLAY_CHANGE_TO_DATA_MODE;
 
+        // Write zeros to all columns for the current page (clear the pixels on the screen)
         for(j = 0; j < 128; j++) {
-            spi_send_recv(0);  // Send zero to all pixels (clear screen)
+            spi_send_recv(0);  // Send zero to clear the pixel
         }
     }
 }
+
 
 
 bool collision_col(uint8_t* pipe_col, int size){
@@ -514,13 +517,11 @@ bool collision_margins() {
             return true; // Collision with top margin
         }
     }
-
     for ( i = 0; i <12; i++) {
         if (icon_row[i] == 31) {
             return true; // Collision with bottom margin
         }
     }
-
     return false; // No collision detected
 }
 
@@ -543,6 +544,7 @@ void draw_top_line() {
     draw_icon(data_row, data_col, size);
 }
 
+
 void draw_bottom_line() {
     int size = 128; // Total number of pixels in one row (128 columns)
     uint8_t data_row[128];
@@ -558,16 +560,47 @@ void draw_bottom_line() {
     // Draw the line
     draw_icon(data_row, data_col, size);
 }
+
 void game_over(){
   display_string(1,"   GAME OVER");
-    display_string(2,"   PRESS 2");
+    display_string(2,"   RESTART");
+    display_string(3,"   SCORE");
 
   display_update();
 }
 
+void ngt(){
+     int i, j, k;
+                    int c;
+
+                    for (i = 0; i < 4; i++) {
+                        DISPLAY_CHANGE_TO_COMMAND_MODE;
+                        spi_send_recv(0x22);
+                        spi_send_recv(i);
+
+                        spi_send_recv(0x0);
+                        spi_send_recv(0x10);
+
+                        DISPLAY_CHANGE_TO_DATA_MODE;
+
+                        for (j = 0; j < 16; j++) {
+                            c = textbuffer[i][j];
+                            if (c & 0x80)
+                                continue;
+
+                            for (k = 0; k < 8; k++)
+                                spi_send_recv(font[c*8 + k]);
+                        }
+                    }
+}
 
 
+void start(){
+  display_string(1,"   START");
+  display_string(2,"   PRESS 1");
+  display_update();
 
+}
 
 
  
