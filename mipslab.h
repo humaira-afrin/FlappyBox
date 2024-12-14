@@ -60,26 +60,26 @@ extern uint8_t arrow_col[18];
 
 extern uint8_t start_row[59];
 extern uint8_t start_col[59];
-
+extern uint8_t restart_row[251];
+extern uint8_t restart_col[251];
 /**** PIPES ***** */
-extern uint8_t pipe1_row[28];
-extern uint8_t pipe1_col[28];
-extern uint8_t pipe2_row[22];
-extern uint8_t pipe2_col[22];
-extern uint8_t pipe3_row[18];
-extern uint8_t pipe3_col[18];
-extern uint8_t pipe4_row[26];
-extern uint8_t pipe4_col[26];
-extern uint8_t pipe5_row[38];
-extern uint8_t pipe5_col[38];
-extern uint8_t pipe6_row[48];
-extern uint8_t pipe6_col[48];
-extern uint8_t pipe7_row[14];
-extern uint8_t pipe7_col[14];
-extern uint8_t pipe8_row[46];
-extern uint8_t pipe8_col[46];
-extern uint8_t pipe9_row[10];
-extern uint8_t pipe9_col[10];
+
+extern uint8_t pipe1_row[26];
+extern uint8_t pipe1_col[26];
+extern uint8_t pipe2_row[20];
+extern uint8_t pipe2_col[20];
+extern uint8_t pipe3_row[16];
+extern uint8_t pipe3_col[16];
+extern uint8_t pipe4_row[24];
+extern uint8_t pipe4_col[24];
+extern uint8_t pipe5_row[36];
+extern uint8_t pipe5_col[36];
+extern uint8_t pipe7_row[26];
+extern uint8_t pipe7_col[26];
+extern uint8_t pipe8_row[20];
+extern uint8_t pipe8_col[20];
+extern uint8_t pipe9_row[16];
+extern uint8_t pipe9_col[16];
 
 extern uint8_t mainstart_row[59];
 extern uint8_t mainstart_col[59];

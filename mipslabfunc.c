@@ -355,7 +355,7 @@ char * itoaconv( int num )
 
 void CountDown (void) 
 {
-         display_string(2, "FLAPPY BOX");
+         display_string(2, "   FLAPPY BOX");
 	        display_update();
 	        delay( 1000 );
 	        display_string(2, "      3");
@@ -369,7 +369,7 @@ void CountDown (void)
 	        delay( 1000);
 	        display_string(2, "   Press 1");
 	        display_update();
-	        delay( 1000 );  
+	        delay( 500 );  
 	       //display_update();
 }
 
@@ -487,46 +487,53 @@ void clearScreen() {
 }
 
 
+bool collision_col(uint8_t* pipe_col, int size) {
+  int i;
+    for ( i = 0; i < size; i++) { // Fixed loop condition
+        int col_dis = pipe_col[i] - icon_col[3];
+        if (col_dis < 2 && col_dis >= 0) { // Adjust range if needed
+            return true;
+        }
+    }
+    return false; 
+}
 
-bool collision_col(uint8_t* pipe_col, int size){
+bool collision_row(uint8_t* pipe_row, int size) {
   int i;
-  for(i = 0; i <= size; i++){
-    int col_dis = pipe_col[i] - icon_col[3];
-    if(col_dis < 4 && col_dis >= 0){
-        return true;
+    for ( i = 0; i < size; i++) { // Fixed loop condition
+        int row_dis1 = icon_row[1] - pipe_row[i];
+        int row_dis2 = pipe_row[i] - icon_row[4];
+        if ((row_dis1 < 2 && row_dis1 >= 0) || (row_dis2 < 4 && row_dis2 >= 0)) { // Adjust range if needed
+            return true;
+        }
     }
-  }
-  return false; 
+    return false; 
 }
-bool collision_row(uint8_t* pipe_row, int size){
-  int i;
-  for(i = 0; i <= size; i++){
-    int row_dis1 = icon_row[1] - pipe_row[i];
-    int row_dis2 = pipe_row[i]-icon_row[4];
-    if((row_dis1 < 4 && row_dis1 >= 0)||(row_dis2 < 4 && row_dis2 >= 0))
-    {
-        return true;
-    }
-  }
-  return false; 
-}
+
 bool collision_margins() {
   int i;
-    for ( i = 0; i < 12; i++) {
-        if (icon_row[i] == 0) {
-            return true; // Collision with top margin
+    for ( i = 0; i < 12; i++) { // Assume icon_row has 12 elements
+        if (icon_row[i] <= 1 || icon_row[i] >= 30) { // Adjust for partial overlaps
+            return true;
         }
     }
-    for ( i = 0; i <12; i++) {
-        if (icon_row[i] == 31) {
-            return true; // Collision with bottom margin
-        }
-    }
-    return false; // No collision detected
+    return false; 
 }
 
+bool collision() {
+    if (collision_margins()) { // Check margins first
+        return true;
+    }
+    return (collision_col(pipe1_col, 26) && collision_row(pipe1_row, 26)) ||
+           (collision_col(pipe2_col, 20) && collision_row(pipe2_row, 20)) ||
+           (collision_col(pipe3_col, 16) && collision_row(pipe3_row, 16)) ||
+           (collision_col(pipe4_col, 24) && collision_row(pipe4_row, 24)) ||
+           (collision_col(pipe5_col, 36) && collision_row(pipe5_row, 36)) ||
+           (collision_col(pipe7_col, 26) && collision_row(pipe7_row, 26)) ||
+           (collision_col(pipe8_col, 20) && collision_row(pipe8_row, 20)) ||
+           (collision_col(pipe9_col, 16) && collision_row(pipe9_row, 16));
+}
 
-   
 
 void draw_top_line() {
     int size = 128; // Total number of pixels in one row (128 columns)
@@ -543,8 +550,6 @@ void draw_top_line() {
     // Draw the line
     draw_icon(data_row, data_col, size);
 }
-
-
 void draw_bottom_line() {
     int size = 128; // Total number of pixels in one row (128 columns)
     uint8_t data_row[128];
@@ -563,37 +568,12 @@ void draw_bottom_line() {
 
 void game_over(){
   display_string(1,"   GAME OVER");
-    display_string(2,"   RESTART");
-    display_string(3,"   SCORE");
-
   display_update();
+  delay (1000);
+   draw_icon(restart_row, restart_col, 251);
+   display_update();
+   delay (1000);
 }
-
-void ngt(){
-     int i, j, k;
-                    int c;
-
-                    for (i = 0; i < 4; i++) {
-                        DISPLAY_CHANGE_TO_COMMAND_MODE;
-                        spi_send_recv(0x22);
-                        spi_send_recv(i);
-
-                        spi_send_recv(0x0);
-                        spi_send_recv(0x10);
-
-                        DISPLAY_CHANGE_TO_DATA_MODE;
-
-                        for (j = 0; j < 16; j++) {
-                            c = textbuffer[i][j];
-                            if (c & 0x80)
-                                continue;
-
-                            for (k = 0; k < 8; k++)
-                                spi_send_recv(font[c*8 + k]);
-                        }
-                    }
-}
-
 
 void start(){
   display_string(1,"   START");
@@ -602,6 +582,22 @@ void start(){
 
 }
 
+
+
+
+void reInt() {
+    // Reinitialize pipes' positions (ensure that move_icon is moving them to starting positions)
+    move_icon(pipe1_row, pipe1_col, 26, 0, 0);
+    move_icon(pipe3_row, pipe3_col, 16, 0, 20);
+
+    move_icon(pipe2_row, pipe2_col, 20, 0, 60);
+    move_icon(pipe4_row, pipe4_col, 24, 0, 80);
+    move_icon(pipe7_row, pipe7_col, 26, 0, 100);
+    move_icon(pipe5_row, pipe5_col, 36, 0, 120);
+
+    move_icon(pipe8_row, pipe8_col, 20, 0, 60); 
+    move_icon(pipe9_row, pipe9_col, 16, 0, 40);   
+  }
 
  
 
