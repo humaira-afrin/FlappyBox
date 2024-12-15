@@ -846,7 +846,7 @@
 #define PIC32_SPICON_ON		0x00008000      /* SPI Peripheral is enabled */
 #define PIC32_SPICON_ENHBUF	0x00010000      /* Enhanced buffer enable */
 #define PIC32_SPICON_SPIFE	0x00020000      /* Frame synchronization pulse
-						 * coincides with the first bit clock */
+						 * coincides with the initial bit clock */
 #define PIC32_SPICON_FRMPOL	0x20000000      /* Frame pulse is active-high */
 #define PIC32_SPICON_FRMSYNC	0x40000000      /* Frame sync pulse input (Slave mode) */
 #define PIC32_SPICON_FRMEN	0x80000000      /* Framed SPI support */
@@ -1062,7 +1062,7 @@
 #define PIC32_NVMCON_NVMOP      0x0000000F
 #define PIC32_NVMCON_NOP                 0 /* No operation */
 #define PIC32_NVMCON_WORD_PGM            1 /* Word program */
-#define PIC32_NVMCON_ROW_PGM             3 /* Row program */
+#define PIC32_NVMCON_X_PGM             3 /* X program */
 #define PIC32_NVMCON_PAGE_ERASE          4 /* Page erase */
 
 #define PIC32_NVMCON_LVDSTAT    0x00000800

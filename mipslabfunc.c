@@ -218,7 +218,7 @@ static void num32asc( char * s, int n )
 /*
  * nextprime
  * 
- * Return the first prime number larger than the integer
+ * Return the initial prime number larger than the integer
  * given as a parameter. The integer must be positive.
  */
 #define PRIME_FALSE   0     /* Constant to help readability. */
@@ -291,7 +291,7 @@ int nextprime( int inval )
  * its positive counterpart. We then use the positive
  * absolute value for conversion.
  * 
- * Conversion produces the least-significant digits first,
+ * Conversion produces the least-significant digits initial,
  * which is the reverse of the order in which we wish to
  * print the digits. We therefore store all digits in a buffer,
  * in ASCII form.
@@ -328,7 +328,7 @@ char * itoaconv( int num )
   else
   {
     if( num < 0 ) num = -num;           /* Make number positive. */
-    i = ITOA_BUFSIZ - 2;                /* Location for first ASCII digit. */
+    i = ITOA_BUFSIZ - 2;                /* Location for initial ASCII digit. */
     do {
       itoa_buffer[ i ] = num % 10 + '0';/* Insert next digit. */
       num = num / 10;                   /* Remove digit from number. */
@@ -341,7 +341,7 @@ char * itoaconv( int num )
     }
   }
   /* Since the loop always sets the index i to the next empty position,
-   * we must add 1 in order to return a pointer to the first occupied position. */
+   * we must add 1 in order to return a pointer to the initial occupied position. */
   return( &itoa_buffer[ i + 1 ] );
 }
 /*****************************************************/
@@ -355,7 +355,7 @@ char * itoaconv( int num )
 
 void CountDown (void) 
 {
-         display_string(2, "   FLAPPY BOX");
+         display_string(2, " FLAPPY BOX");
 	        display_update();
 	        delay( 1000 );
 	        display_string(2, "      3");
@@ -406,52 +406,52 @@ void highScoreCheck(){
 /*###############################################################################*/
 uint8_t myArray[1024] = {0}; 
 
-void draw_pixel(int row, int col){  // ritar en pixel på den row och col koordinat man skickar in, row∈[0,31], col∈[0,127]
-  if(row < 0) { row = 0; }
-  if(row > 31) { row = 31; }
+void draw_pixel(int X, int col){  
+  if(X < 0) { X = 0; }
+  if(X > 31) { X = 31; }
 
   if(col < 0) { col = 0; }
   if(col > 127) { col = 127; }
 
-  int rowIndex = row / 8; //page number
-  int bit_pos = row % 8; //pixel number 
+  int XIndex = X / 8; //page number
+  int bit_pos = X % 8; //pixel number 
   int bitmask = 1 << bit_pos;
 
 
-  display_pixel(rowIndex, col, bitmask);
+  display_pixel(XIndex, col, bitmask);
 
 }
 
-void display_pixel(int row, int col, int val) { 
-    uint8_t x = myArray[row*128 + col]; // Get the current pixel value in memory
+void display_pixel(int X, int col, int val) { 
+    uint8_t x = myArray[X*128 + col]; // Get the current pixel value in memory
     x = (val == 0) ? (x & ~val) : (x | val); // Only set or clear the bit based on val
-    myArray[row*128 + col] = x; // Update the pixel in memory
+    myArray[X*128 + col] = x; // Update the pixel in memory
 
     // Set the page and column address for display update
     DISPLAY_CHANGE_TO_COMMAND_MODE;
     spi_send_recv(0x22);  // Command to set page address
-    spi_send_recv(row);   // Set the row (page) address
-    spi_send_recv(row);   // Same value for start and end address (single row)
+    spi_send_recv(X);   // Set the X (page) address
+    spi_send_recv(X);   // Same value for start and end address (single X)
     spi_send_recv(0x21);  // Command to set column address
     spi_send_recv(col);   // Set column (x-axis) address
     spi_send_recv(col);   // Same value for start and end address (single column)
 
     DISPLAY_CHANGE_TO_DATA_MODE;
-    spi_send_recv(myArray[row*128 + col]);  // Send the updated pixel value to the display
+    spi_send_recv(myArray[X*128 + col]);  // Send the updated pixel value to the display
 }
 
 
-void draw_icon(uint8_t* data_row, uint8_t* data_col, int size){   //ritar hela iconen med hjälp av en forloop som loopar igenom varje pixel man har på rows och columner så att hela iconen kan displayas
+void draw_icon(uint8_t* data_X, uint8_t* data_col, int size){   //ritar hela iconen med hjälp av en forloop som loopar igenom varje pixel man har på Xs och columner så att hela iconen kan displayas
   int i;
   for(i = 0; i < size; i++){
-    draw_pixel(data_row[i], data_col[i]);
+    draw_pixel(data_X[i], data_col[i]);
   }
 }
 
-void move_icon(uint8_t* data_row, uint8_t* data_col,int iconsize,int rowmovment, int colmovment){  // flyttar hela ikonen genom att lägga till det vi skickar in i row- /colmovment i iconens rows och col pixlar. 
+void move_obj(uint8_t* data_X, uint8_t* data_col,int iconsize,int Xmovment, int colmovment){  // flyttar hela ikonen genom att lägga till det vi skickar in i X- /colmovment i iconens Xs och col pixlar. 
   int i;
   for(i = 0; i < iconsize; i++){ //kanske måste lägga till en ny size så att de fungerar på pipsen 
-    data_row[i] += rowmovment;
+    data_X[i] += Xmovment;
     data_col[i] += colmovment;
   }
 }
@@ -487,10 +487,10 @@ void clearScreen() {
 }
 
 
-bool collision_col(uint8_t* pipe_col, int size) {
+bool collision_col(uint8_t* obst_col, int size) {
   int i;
     for ( i = 0; i < size; i++) { // Fixed loop condition
-        int col_dis = pipe_col[i] - icon_col[3];
+        int col_dis = obst_col[i] - icon_col[3];
         if (col_dis < 2 && col_dis >= 0) { // Adjust range if needed
             return true;
         }
@@ -498,12 +498,12 @@ bool collision_col(uint8_t* pipe_col, int size) {
     return false; 
 }
 
-bool collision_row(uint8_t* pipe_row, int size) {
+bool collision_X(uint8_t* obst_X, int size) {
   int i;
     for ( i = 0; i < size; i++) { // Fixed loop condition
-        int row_dis1 = icon_row[1] - pipe_row[i];
-        int row_dis2 = pipe_row[i] - icon_row[4];
-        if ((row_dis1 < 2 && row_dis1 >= 0) || (row_dis2 < 4 && row_dis2 >= 0)) { // Adjust range if needed
+        int X_dis1 = icon_X[1] - obst_X[i];
+        int X_dis2 = obst_X[i] - icon_X[4];
+        if ((X_dis1 < 2 && X_dis1 >= 0) || (X_dis2 < 4 && X_dis2 >= 0)) { // Adjust range if needed
             return true;
         }
     }
@@ -512,8 +512,8 @@ bool collision_row(uint8_t* pipe_row, int size) {
 
 bool collision_margins() {
   int i;
-    for ( i = 0; i < 12; i++) { // Assume icon_row has 12 elements
-        if (icon_row[i] <= 1 || icon_row[i] >= 30) { // Adjust for partial overlaps
+    for ( i = 0; i < 12; i++) { // Assume icon_X has 12 elements
+        if (icon_X[i] <= 1 || icon_X[i] >= 30) { // Adjust for partial overlaps
             return true;
         }
     }
@@ -521,56 +521,56 @@ bool collision_margins() {
 }
 
 bool collision() {
-    if (collision_margins()) { // Check margins first
+    if (collision_margins()) { // Check margins initial
         return true;
     }
-    return (collision_col(pipe1_col, 26) && collision_row(pipe1_row, 26)) ||
-           (collision_col(pipe2_col, 20) && collision_row(pipe2_row, 20)) ||
-           (collision_col(pipe3_col, 16) && collision_row(pipe3_row, 16)) ||
-           (collision_col(pipe4_col, 24) && collision_row(pipe4_row, 24)) ||
-           (collision_col(pipe5_col, 36) && collision_row(pipe5_row, 36)) ||
-           (collision_col(pipe7_col, 26) && collision_row(pipe7_row, 26)) ||
-           (collision_col(pipe8_col, 20) && collision_row(pipe8_row, 20)) ||
-           (collision_col(pipe9_col, 16) && collision_row(pipe9_row, 16));
+    return (collision_col(obst1_col, 26) && collision_X(obst1_X, 26)) ||
+           (collision_col(obst2_col, 20) && collision_X(obst2_X, 20)) ||
+           (collision_col(obst3_col, 16) && collision_X(obst3_X, 16)) ||
+           (collision_col(obst4_col, 24) && collision_X(obst4_X, 24)) ||
+           (collision_col(obst5_col, 36) && collision_X(obst5_X, 36)) ||
+           (collision_col(obst7_col, 26) && collision_X(obst7_X, 26)) ||
+           (collision_col(obst8_col, 20) && collision_X(obst8_X, 20)) ||
+           (collision_col(obst9_col, 16) && collision_X(obst9_X, 16));
 }
 
 
 void draw_top_line() {
-    int size = 128; // Total number of pixels in one row (128 columns)
-    uint8_t data_row[128];
+    int size = 128; // Total number of pixels in one X (128 columns)
+    uint8_t data_X[128];
     uint8_t data_col[128];
     int i;
     
     // Populate the arrays
     for ( i = 0; i < size; i++) {
-        data_row[i] = 0;   // Top row (row index 0)
+        data_X[i] = 0;   // Top X (X index 0)
         data_col[i] = i;   // All columns from 0 to 127
     }
     
     // Draw the line
-    draw_icon(data_row, data_col, size);
+    draw_icon(data_X, data_col, size);
 }
 void draw_bottom_line() {
-    int size = 128; // Total number of pixels in one row (128 columns)
-    uint8_t data_row[128];
+    int size = 128; // Total number of pixels in one X (128 columns)
+    uint8_t data_X[128];
     uint8_t data_col[128];
     int i;
     
     // Populate the arrays
     for ( i = 0; i < size; i++) {
-        data_row[i] = 128;   // Top row (row index 0)
+        data_X[i] = 128;   // Top X (X index 0)
         data_col[i] = i;   // All columns from 0 to 127
     }
     
     // Draw the line
-    draw_icon(data_row, data_col, size);
+    draw_icon(data_X, data_col, size);
 }
 
 void game_over(){
   display_string(1,"   GAME OVER");
   display_update();
   delay (1000);
-   draw_icon(restart_row, restart_col, 251);
+   draw_icon(restart_X, restart_col, 251);
    display_update();
    delay (1000);
 }
@@ -586,17 +586,18 @@ void start(){
 
 
 void reInt() {
-    // Reinitialize pipes' positions (ensure that move_icon is moving them to starting positions)
-    move_icon(pipe1_row, pipe1_col, 26, 0, 0);
-    move_icon(pipe3_row, pipe3_col, 16, 0, 20);
+    // Reinitialize obsts' positions (ensure that move_obj is moving them to starting positions)
+    move_obj(obst1_X, obst1_col, 26, 0, 0);
+    move_obj(obst3_X, obst3_col, 16, 0, 20);
 
-    move_icon(pipe2_row, pipe2_col, 20, 0, 60);
-    move_icon(pipe4_row, pipe4_col, 24, 0, 80);
-    move_icon(pipe7_row, pipe7_col, 26, 0, 100);
-    move_icon(pipe5_row, pipe5_col, 36, 0, 120);
+    move_obj(obst2_X, obst2_col, 20, 0, 40);
+    move_obj(obst4_X, obst4_col, 24, 0, 60);
+    move_obj(obst7_X, obst7_col, 26, 0, 60);
+    move_obj(obst5_X, obst5_col, 36, 0, 80);
 
-    move_icon(pipe8_row, pipe8_col, 20, 0, 60); 
-    move_icon(pipe9_row, pipe9_col, 16, 0, 40);   
+    move_obj(obst8_X, obst8_col, 20, 0, 100); 
+    move_obj(obst9_X, obst9_col, 16, 0, 120); 
+    move_obj(icon_X, icon_col, 12, 0, 0);   
   }
 
  

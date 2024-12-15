@@ -62,23 +62,23 @@ int main(void) {
 
 
 	display_update();
-	/*draw_icon (icon_row, icon_col, 20);
-	draw_icon (pipe5_row, pipe5_col, 38);
-	draw_icon (pipe1_row, pipe1_col, 28);*/
+	/*draw_icon (icon_X, icon_col, 20);
+	draw_icon (obst5_X, obst5_col, 38);
+	draw_icon (obst1_X, obst1_col, 28);*/
 
 
 
-   //draw_icon (pipe5_row, pipe5_col, 38);
+   //draw_icon (obst5_X, obst5_col, 38);
 
 	//clearScreenMemory();
 	/*drawBox(10, 20, 8, 8);
 	display_update();
 	merge(nybild, icon, triangle);*/
-	/*display_image(1,flappyrow);
+	/*display_image(1,flappyX);
 	display_image(1,flappycol);
-	display_image(1,flappyrow2);
+	display_image(1,flappyX2);
 	display_image(1,flappycol2);
-	display_image(1,flappyrow_border);*/
+	display_image(1,flappyX_border);*/
 	//display_image(1,triangle1);
 	//display_image(2,triangle2);
 

@@ -17,13 +17,13 @@ uint8_t spi_send_recv(uint8_t data);
 
 /* Declare lab-related functions from mipslabfunc.c */
 extern const int decimalPosToBinary[8];
-void draw_pixel(int row, int col);
-void display_pixel(int row, int col, int val);
-void draw_icon(uint8_t* data_row, uint8_t* data_col, int size);
-void move_icon(uint8_t* data_row, uint8_t* data_col,int iconsize, int rowmovment, int colmovment);
+void draw_pixel(int X, int col);
+void display_pixel(int X, int col, int val);
+void draw_icon(uint8_t* data_X, uint8_t* data_col, int size);
+void move_obj(uint8_t* data_X, uint8_t* data_col,int iconsize, int Xmovment, int colmovment);
 void clearScreen();
-bool collision_col(uint8_t* pipe_col, int size);
-bool collision_row(uint8_t* pipe_row, int size);
+bool collision_col(uint8_t* obst_col, int size);
+bool collision_X(uint8_t* obst_X, int size);
 void draw_top_line();
 void draw_bottom_line();
 bool collision_margins();
@@ -52,36 +52,36 @@ void display_debug( volatile int * const addr );
 /* Declare bitmap array containing font */
 extern const uint8_t const font[128*8];
 /* Declare bitmap array containing icon */
- extern uint8_t icon_row[12];
+extern uint8_t icon_X[12];
 extern uint8_t icon_col[12];
-extern uint8_t arrow_row[18];
-extern uint8_t arrow_col[18];
+extern uint8_t arX_X[18];
+extern uint8_t arX_col[18];
 
 
-extern uint8_t start_row[59];
+extern uint8_t start_X[59];
 extern uint8_t start_col[59];
-extern uint8_t restart_row[251];
+extern uint8_t restart_X[251];
 extern uint8_t restart_col[251];
-/**** PIPES ***** */
+/**** obstS ***** */
 
-extern uint8_t pipe1_row[26];
-extern uint8_t pipe1_col[26];
-extern uint8_t pipe2_row[20];
-extern uint8_t pipe2_col[20];
-extern uint8_t pipe3_row[16];
-extern uint8_t pipe3_col[16];
-extern uint8_t pipe4_row[24];
-extern uint8_t pipe4_col[24];
-extern uint8_t pipe5_row[36];
-extern uint8_t pipe5_col[36];
-extern uint8_t pipe7_row[26];
-extern uint8_t pipe7_col[26];
-extern uint8_t pipe8_row[20];
-extern uint8_t pipe8_col[20];
-extern uint8_t pipe9_row[16];
-extern uint8_t pipe9_col[16];
+extern uint8_t obst1_X[26];
+extern uint8_t obst1_col[26];
+extern uint8_t obst2_X[20];
+extern uint8_t obst2_col[20];
+extern uint8_t obst3_X[16];
+extern uint8_t obst3_col[16];
+extern uint8_t obst4_X[24];
+extern uint8_t obst4_col[24];
+extern uint8_t obst5_X[36];
+extern uint8_t obst5_col[36];
+extern uint8_t obst7_X[26];
+extern uint8_t obst7_col[26];
+extern uint8_t obst8_X[20];
+extern uint8_t obst8_col[20];
+extern uint8_t obst9_X[16];
+extern uint8_t obst9_col[16];
 
-extern uint8_t mainstart_row[59];
+extern uint8_t mainstart_X[59];
 extern uint8_t mainstart_col[59];
 //extern const uint8_t const icon2[128];
   uint8_t triangle[128*4];
@@ -91,7 +91,7 @@ extern uint8_t mainstart_col[59];
 
 extern const uint8_t const obs1[128];
 extern const uint8_t const box[4*8];
-extern uint8_t gameover_row[235];
+extern uint8_t gameover_X[235];
 extern uint8_t gameover_col[235];
 
 int gameState;

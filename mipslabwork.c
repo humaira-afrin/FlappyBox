@@ -24,9 +24,9 @@ int count = 0;
 int gamestate = 0;
 int box_move;
 int prime = 1234567;
-bool first = true;
+bool initial = true;
 bool active = false;
-int score1;
+int pos;
 
 /* Interrupt Service Routine */
 void user_isr(void) 
@@ -45,16 +45,16 @@ void user_isr(void)
             case 0: // Menu state
             clearScreen(); // Clear the screen to reset any previous drawings
             
-            if (first) 
+            if (initial) 
             {
                 display_update(); // Update the display to reflect the cleared screen
                 CountDown(); 
-                move_icon(icon_row, icon_col, 12, 1, 0);
-                first = false;
+                move_obj(icon_X, icon_col, 12, 1, 0);
+                initial = false;
             }
              
-            // move_icon(icon_row, icon_col, 12, -3, 0);
-            draw_icon(icon_row, icon_col, 12);
+            draw_icon(icon_X, icon_col, 12);
+
 
             // Check if button 4 is pressed
             if (getbtns() == 4) 
@@ -62,37 +62,38 @@ void user_isr(void)
                 clearScreen(); // Clear the screen to remove all drawings
                 display_update(); // Update the display to reflect the cleared screen
                 gamestate = 1; // Transition to the next game state
-                first = true;  // Reset the first flag for the next state
+                initial = true;  // Reset the initial flag for the next state
             }
             break;
 
             case 1: // Game state
-                    count2++;
+                    
                     clearScreen();
                     draw_top_line();
                     draw_bottom_line();
-                    draw_icon(icon_row, icon_col, 12); 
+                    draw_icon(icon_X, icon_col, 12); 
 
-                    if (first) 
+                    if (initial) 
                     {
                         clearScreen();
                         draw_top_line();
                         draw_bottom_line();
-                        draw_icon(icon_row, icon_col, 12);
+                        draw_icon(icon_X, icon_col, 12);
                         delay(1000);
                         box_move = 1;
-                        first = false;
+                        initial = false;
                     }
                    
                     
-                    if (getbtns() == 4 && !first)
+                    if (getbtns() == 4 && !initial)
                     {
                         box_move = -2;
                         clearScreen();
                         draw_bottom_line();
                         draw_top_line();
-                        draw_icon(icon_row, icon_col, 12);
+                        draw_icon(icon_X, icon_col, 12);
                         active = true;
+                        pos = pos+2;
                        
                     } 
                   
@@ -101,53 +102,60 @@ void user_isr(void)
                         clearScreen();
                         draw_bottom_line();
                         draw_top_line();
-                        draw_icon(icon_row, icon_col, 12);
+                        draw_icon(icon_X, icon_col, 12);
                         box_move = 1;
+                        pos = pos-1;
                         
                     }
+                      // SW1 - Resume the Timer
+                        if (IFS(0) & 0x80) {          // Check SW1 interrupt flag
+                        T2CON = 0x8070;           // Resume Timer2
+                        IFSCLR(0) = 0x80;         // Clear SW1 interrupt flag
+                        CountDown();              // Show the countdown
+                        gamestate = 1;            // Set the game state to 'Game Running'
+                        active = true;            // Reactivate the game loop
+                    }
 
-                    move_icon(icon_row, icon_col, 12, box_move, 0);
+                        // SW3 - Pause the Timer
+                        if (IFS(0) & 0x8000) {        // Check SW3 interrupt flag
+                            T2CONCLR   = 0x8000;      // Pause Timer2 by clearing the ON bit
+                            IFSCLR(0)  = 0x8000;      // Clear SW3 interrupt flag
+                        }
+
+
+                    move_obj(icon_X, icon_col, 12, box_move, 0);
 
                     if (active) 
                     {    
-                        // Draw and move pipes based on their positions and intervals
-                        draw_icon(pipe1_row, pipe1_col, 26);
-                        move_icon(pipe1_row, pipe1_col, 26, 0, -1);
+                        // Draw and move obsts based on their positions and intervals
+                        draw_icon(obst1_X, obst1_col, 26);
+                        move_obj(obst1_X, obst1_col, 26, 0, -1);
 
-                        draw_icon(pipe2_row, pipe2_col, 20);
-                        move_icon(pipe2_row, pipe2_col, 20, 0, -1);
+                        draw_icon(obst2_X, obst2_col, 20);
+                        move_obj(obst2_X, obst2_col, 20, 0, -1);
 
-                        draw_icon(pipe3_row, pipe3_col, 16);
-                        move_icon(pipe3_row, pipe3_col, 16, 0, -1);
+                        draw_icon(obst3_X, obst3_col, 16);
+                        move_obj(obst3_X, obst3_col, 16, 0, -1);
 
-                        draw_icon(pipe4_row, pipe4_col, 24);
-                        move_icon(pipe4_row, pipe4_col, 24, 0, -1);
+                        draw_icon(obst4_X, obst4_col, 24);
+                        move_obj(obst4_X, obst4_col, 24, 0, -1);
 
-                        draw_icon(pipe5_row, pipe5_col, 36);
-                        move_icon(pipe5_row, pipe5_col, 36, 0, -1);
+                        draw_icon(obst5_X, obst5_col, 36);
+                        move_obj(obst5_X, obst5_col, 36, 0, -1);
 
-                        draw_icon(pipe7_row, pipe7_col, 26);
-                        move_icon(pipe7_row, pipe7_col, 26, 0, -1);
+                        draw_icon(obst7_X, obst7_col, 26);
+                        move_obj(obst7_X, obst7_col, 26, 0, -1);
 
-                        draw_icon(pipe8_row, pipe8_col, 20);
-                        move_icon(pipe8_row, pipe8_col, 20, 0, -1);
+                        draw_icon(obst8_X, obst8_col, 20);
+                        move_obj(obst8_X, obst8_col, 20, 0, -1);
 
-                        draw_icon(pipe9_row, pipe9_col, 16);
-                        move_icon(pipe9_row, pipe9_col, 16, 0, -1);
+                        draw_icon(obst9_X, obst9_col, 16);
+                        move_obj(obst9_X, obst9_col, 16, 0, -1);
                     }
-
+                      
                     // Check for collisions
                     if (collision()) 
                     {
-                        move_icon(pipe1_row, pipe1_col, 26, 0, 180);
-                        move_icon(pipe2_row, pipe2_col, 20, 0, 180);
-                        move_icon(pipe3_row, pipe3_col, 16, 0, 180);
-                        move_icon(pipe5_row, pipe4_col, 24, 0, 180);
-                        move_icon(pipe9_row, pipe5_col, 36, 0, 180);
-                        move_icon(pipe4_row, pipe7_col, 26, 0, 180);
-                        move_icon(pipe7_row, pipe8_col, 20, 0, 180);
-                        move_icon(pipe8_row, pipe9_col, 16, 0, 180);
-
                         active = false;
                         clearScreen();
                         gamestate = 2; // Transition to Game Over state
@@ -156,24 +164,17 @@ void user_isr(void)
 
              case 2: // Game Over state
                 clearScreen(); // Clear the screen before showing game over
-                draw_icon(restart_row, restart_col, 251); // Draw the restart icon
-                
+                draw_icon(restart_X, restart_col, 251); // Draw the restart icon
                 if (getbtns() == 1) { // Restart the game when button 1 is pressed
                     clearScreen(); // Clear the screen before restarting
-
-                    // Reinitialize all relevant variables
-                    first = true;      // Reset first flag
+                    move_obj(icon_X, icon_col, 12,pos,0);
+                    initial = true;      // Reset initial flag
                     box_move = 1;      // Reset box movement
                     active = false;    // Reset active status
-                    score1 = 0;        // Reset score
+                    pos = 0;        // Reset pos Y
                     gamestate = 0;     // Set gamestate back to the menu
 
-                    // Reinitialize pipes and player icon positions
                     reInt();
-
-                    // Reinitialize the player icon position
-                    move_icon(icon_row, icon_col, 12, 0, 0);
-
                     clearScreen(); // Clear screen again after reinitializing the game
                 }
                 break;
@@ -198,9 +199,38 @@ void labinit(void)
     T2CONSET = 0x0070; // Set to prescale 1:256
     PR2 = ((80000000 / 256) / 100); // Set period for 10Hz
     T2CONSET = 0x8000; // Enable timer 2
+    IPCSET(2) = 0x1F;  // Priority level for Timer2
 
-    IPCSET(2) = 6; // Set interrupt priority
+
+
+
+   // IPCSET(2) = 6; // Set interrupt priority
     IECSET(0) = 0x100; // Enable Timer2 interrupt
+
+    /* SWITCH 3 */
+  TRISDSET = 0x400; // Set bit 10 as input
+  IECSET(0)=0x8000;
+  IPC(3)=0x1F00; //bit 10-12 är priority
+
+  /*SWTICH 1*/
+  TRISDSET = 0x100; // Set bit  as input
+  IECSET(0)=0x80;
+  IPC(1)=0x1F000000;
+
+    /* SWITCH 3 - Pause */
+    TRISDSET = 0x400;     // Set bit 10 as input for SW3
+  /* SWITCH 3 - Pause */
+    TRISDSET      = 0x400;        // Set bit 10 as input for SW3
+    IECSET(0)     = 0x8000;       // Enable SW3 interrupt (bit 15)
+    IPCSET(3)     = 0x1F00;       // Set priority for SW3 (bits 10-15)
+
+    /* SWITCH 1 - Resume */
+    TRISDSET      = 0x100;        // Set bit 8 as input for SW1
+    IECSET(0)     = 0x80;         // Enable SW1 interrupt (bit 7)
+    IPCSET(1)     = 0x1F000000;   // Set priority for SW1 (bits 24-29)
+
+  
+ 
 
     enable_interrupts();
 
@@ -208,12 +238,17 @@ void labinit(void)
     reInt();
 
     // Initialize player icon position
-    move_icon(icon_row, icon_col, 12, 0, 0);
+    move_obj(icon_X, icon_col, 12, -2, 0);
 
     return;
 }
 
 /* This function is called repetitively from the main program */
-void labwork(void) {   
-    prime = nextprime(prime);
+void labwork(void) {
+    if (gamestate == 1 && active) { 
+        
+        prime = nextprime(prime);
+    } else if (gamestate == 0) {
+        
+    }
 }
