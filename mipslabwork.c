@@ -22,7 +22,7 @@ volatile int count2 = 0; // Declare count2 globally and initialize to 0
 int timeoutcount = 0; 
 int count = 0;
 int gamestate = 0;
-int box_move;
+int gravity;
 int prime = 1234567;
 bool initial = true;
 bool active = false;
@@ -37,11 +37,11 @@ void user_isr(void)
         timeoutcount++; 
 
         if (timeoutcount == 10) 
-        { // Every 10th interrupt
+        { // Every 10th interrupt = 1 second
             timeoutcount = 0;
 
            switch (gamestate) 
-{
+        {
             case 0: // Menu state
             clearScreen(); // Clear the screen to reset any previous drawings
             
@@ -52,7 +52,7 @@ void user_isr(void)
                 move_obj(icon_X, icon_col, 12, 1, 0);
                 initial = false;
             }
-             
+            
             draw_icon(icon_X, icon_col, 12);
 
 
@@ -80,14 +80,14 @@ void user_isr(void)
                         draw_bottom_line();
                         draw_icon(icon_X, icon_col, 12);
                         delay(1000);
-                        box_move = 1;
+                        gravity = 1;
                         initial = false;
                     }
-                   
+                
                     
-                    if (getbtns() == 4 && !initial)
+                    if (getbtns() == 4 )
                     {
-                        box_move = -2;
+                        gravity = -2;
                         clearScreen();
                         draw_bottom_line();
                         draw_top_line();
@@ -103,7 +103,7 @@ void user_isr(void)
                         draw_bottom_line();
                         draw_top_line();
                         draw_icon(icon_X, icon_col, 12);
-                        box_move = 1;
+                        gravity = 1;
                         pos = pos-1;
                         
                     }
@@ -123,7 +123,7 @@ void user_isr(void)
                         }
 
 
-                    move_obj(icon_X, icon_col, 12, box_move, 0);
+                    move_obj(icon_X, icon_col, 12, gravity, 0);
 
                     if (active) 
                     {    
@@ -169,7 +169,7 @@ void user_isr(void)
                     clearScreen(); // Clear the screen before restarting
                     move_obj(icon_X, icon_col, 12,pos,0);
                     initial = true;      // Reset initial flag
-                    box_move = 1;      // Reset box movement
+                    gravity = 1;      // Reset box movement
                     active = false;    // Reset active status
                     pos = 0;        // Reset pos Y
                     gamestate = 0;     // Set gamestate back to the menu
@@ -197,7 +197,7 @@ void labinit(void)
     // Timer2 initialization
     TMR2 = 0;          // Initialize timer 2
     T2CONSET = 0x0070; // Set to prescale 1:256
-    PR2 = ((80000000 / 256) / 100); // Set period for 10Hz
+    PR2 = ((80000000 / 256) / 100); // Set period for 10Hz or an interrupt 100 times per second
     T2CONSET = 0x8000; // Enable timer 2
     IPCSET(2) = 0x1F;  // Priority level for Timer2
 
@@ -220,17 +220,14 @@ void labinit(void)
     /* SWITCH 3 - Pause */
     TRISDSET = 0x400;     // Set bit 10 as input for SW3
   /* SWITCH 3 - Pause */
-    TRISDSET      = 0x400;        // Set bit 10 as input for SW3
-    IECSET(0)     = 0x8000;       // Enable SW3 interrupt (bit 15)
-    IPCSET(3)     = 0x1F00;       // Set priority for SW3 (bits 10-15)
+    TRISDSET   = 0x400;        // Set bit 10 as input for SW3
+    IECSET(0) = 0x8000;       // Enable SW3 interrupt (bit 15)
+    IPCSET(3)  = 0x1F00;       // Set priority for SW3 (bits 10-15)
 
     /* SWITCH 1 - Resume */
-    TRISDSET      = 0x100;        // Set bit 8 as input for SW1
-    IECSET(0)     = 0x80;         // Enable SW1 interrupt (bit 7)
-    IPCSET(1)     = 0x1F000000;   // Set priority for SW1 (bits 24-29)
-
-  
- 
+    TRISDSET   = 0x100;        // Set bit 8 as input for SW1
+    IECSET(0) = 0x80;         // Enable SW1 interrupt (bit 7)
+    IPCSET(1)= 0x1F000000;   // Set priority for SW1 (bits 24-29)
 
     enable_interrupts();
 
@@ -246,7 +243,6 @@ void labinit(void)
 /* This function is called repetitively from the main program */
 void labwork(void) {
     if (gamestate == 1 && active) { 
-        
         prime = nextprime(prime);
     } else if (gamestate == 0) {
         

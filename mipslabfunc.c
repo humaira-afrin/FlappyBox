@@ -369,7 +369,7 @@ void CountDown (void)
 	        delay( 1000);
 	        display_string(2, "   Press 1");
 	        display_update();
-	        delay( 500 );  
+	        delay( 200 );  
 	       //display_update();
 }
 
@@ -404,28 +404,32 @@ void highScoreCheck(){
 }
 
 /*###############################################################################*/
-uint8_t myArray[1024] = {0}; 
+uint8_t memArr[1024] = {0}; 
 
-void draw_pixel(int X, int col){  
-  if(X < 0) { X = 0; }
+void mark_pixel(int X, int col){  
+  if(X < 0) { X = 0; } // Ensures the X coordinate (row) is not negative.
   if(X > 31) { X = 31; }
 
   if(col < 0) { col = 0; }
   if(col > 127) { col = 127; }
 
   int XIndex = X / 8; //page number
-  int bit_pos = X % 8; //pixel number 
-  int bitmask = 1 << bit_pos;
+  int bit_pos = X % 8; //exakt position of the row in the page
+  int bitmask = 1 << bit_pos; // to modufy that bit position row 8 is 0 row 9 is 1 roe 10 is 2
+ // om bit pis = 2 third row, bit mask will be 100 turn on third pixel
 
-
-  display_pixel(XIndex, col, bitmask);
+  show_pixel(XIndex, col, bitmask);
 
 }
 
-void display_pixel(int X, int col, int val) { 
-    uint8_t x = myArray[X*128 + col]; // Get the current pixel value in memory
-    x = (val == 0) ? (x & ~val) : (x | val); // Only set or clear the bit based on val
-    myArray[X*128 + col] = x; // Update the pixel in memory
+void show_pixel(int X, int col, int pos) { 
+    uint8_t x = memArr[X*128 + col]; // Get the current pixel value in memory
+    if (pos == 0) {  // edge case, safe
+        x = x & ~pos; // Clear the bit (
+    } else {
+        x = x | pos;  // Set the bit (turn on the pixel)
+    }
+    memArr[X*128 + col] = x; // Update the pixel in memory
 
     // Set the page and column address for display update
     DISPLAY_CHANGE_TO_COMMAND_MODE;
@@ -437,14 +441,14 @@ void display_pixel(int X, int col, int val) {
     spi_send_recv(col);   // Same value for start and end address (single column)
 
     DISPLAY_CHANGE_TO_DATA_MODE;
-    spi_send_recv(myArray[X*128 + col]);  // Send the updated pixel value to the display
+    spi_send_recv(memArr[X*128 + col]);  // Send the updated pixel value to the display
 }
 
 
 void draw_icon(uint8_t* data_X, uint8_t* data_col, int size){   //ritar hela iconen med hjälp av en forloop som loopar igenom varje pixel man har på Xs och columner så att hela iconen kan displayas
   int i;
   for(i = 0; i < size; i++){
-    draw_pixel(data_X[i], data_col[i]);
+    mark_pixel(data_X[i], data_col[i]);
   }
 }
 
@@ -462,7 +466,7 @@ void clearScreen() {
     
     // Clear the array used for storing pixel data (reset all pixels to 0)
     for(i = 0; i < 1024; i++) {
-        myArray[i] = 0;  // Set all bytes to 0 (clearing the screen in memory)
+        memArr[i] = 0;  // Set all bytes to 0 (clearing the screen in memory)
     }
 
     // Reset the display by writing zero to all screen data
@@ -475,7 +479,7 @@ void clearScreen() {
 
         // Set the start and end column for the page (0 to 127)
         spi_send_recv(0x00);   // Start column (0)
-        spi_send_recv(0x10);   // End column (128)
+        spi_send_recv(0x10);   // rightmost column (128
 
         DISPLAY_CHANGE_TO_DATA_MODE;
 
@@ -500,10 +504,10 @@ bool collision_col(uint8_t* obst_col, int size) {
 
 bool collision_X(uint8_t* obst_X, int size) {
   int i;
-    for ( i = 0; i < size; i++) { // Fixed loop condition
+    for ( i = 0; i < size; i++) { // 
         int X_dis1 = icon_X[1] - obst_X[i];
         int X_dis2 = obst_X[i] - icon_X[4];
-        if ((X_dis1 < 2 && X_dis1 >= 0) || (X_dis2 < 4 && X_dis2 >= 0)) { // Adjust range if needed
+        if ((X_dis1 < 2 && X_dis1 >= 0) || (X_dis2 < 2 && X_dis2 >= 0)) { // 
             return true;
         }
     }
@@ -512,7 +516,7 @@ bool collision_X(uint8_t* obst_X, int size) {
 
 bool collision_margins() {
   int i;
-    for ( i = 0; i < 12; i++) { // Assume icon_X has 12 elements
+    for ( i = 0; i < 12; i++) { //  icon_X has 12 elements
         if (icon_X[i] <= 1 || icon_X[i] >= 30) { // Adjust for partial overlaps
             return true;
         }
@@ -586,16 +590,16 @@ void start(){
 
 
 void reInt() {
-    // Reinitialize obsts' positions (ensure that move_obj is moving them to starting positions)
+    // Reinitialize obsts' positions 
     move_obj(obst1_X, obst1_col, 26, 0, 0);
     move_obj(obst3_X, obst3_col, 16, 0, 20);
 
     move_obj(obst2_X, obst2_col, 20, 0, 40);
     move_obj(obst4_X, obst4_col, 24, 0, 60);
-    move_obj(obst7_X, obst7_col, 26, 0, 60);
+    move_obj(obst7_X, obst7_col, 26, 0, 100);
     move_obj(obst5_X, obst5_col, 36, 0, 80);
 
-    move_obj(obst8_X, obst8_col, 20, 0, 100); 
+    move_obj(obst8_X, obst8_col, 20, 0, 110); 
     move_obj(obst9_X, obst9_col, 16, 0, 120); 
     move_obj(icon_X, icon_col, 12, 0, 0);   
   }

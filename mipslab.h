@@ -17,8 +17,8 @@ uint8_t spi_send_recv(uint8_t data);
 
 /* Declare lab-related functions from mipslabfunc.c */
 extern const int decimalPosToBinary[8];
-void draw_pixel(int X, int col);
-void display_pixel(int X, int col, int val);
+void mark_pixel(int X, int col);
+void show_pixel(int X, int col, int val);
 void draw_icon(uint8_t* data_X, uint8_t* data_col, int size);
 void move_obj(uint8_t* data_X, uint8_t* data_col,int iconsize, int Xmovment, int colmovment);
 void clearScreen();
