@@ -406,12 +406,17 @@ void highScoreCheck(){
 /*###############################################################################*/
 uint8_t memArr[1024] = {0}; 
 
-void mark_pixel(int X, int col){  
+void mark_pixel(int X, int col){  // which pixel to modify
   if(X < 0) { X = 0; } // Ensures the X coordinate (row) is not negative.
   if(X > 31) { X = 31; }
 
-  if(col < 0) { col = 0; }
-  if(col > 127) { col = 127; }
+  if(col < 0) 
+  { 
+    col = 0;
+  }
+  if(col > 127) { 
+    col = 127; 
+  }
 
   int XIndex = X / 8; //page number
   int bit_pos = X % 8; //exakt position of the row in the page
@@ -422,7 +427,7 @@ void mark_pixel(int X, int col){
 
 }
 
-void show_pixel(int X, int col, int pos) { 
+void show_pixel(int X, int col, int pos) { //modify pixel , turn on or off
     uint8_t x = memArr[X*128 + col]; // Get the current pixel value in memory
     if (pos == 0) {  // edge case, safe
         x = x & ~pos; // Clear the bit (
